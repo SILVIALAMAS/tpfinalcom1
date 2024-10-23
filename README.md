@@ -126,36 +126,45 @@ namespace tpfinal
 
         //debo implementar los metodos auxiliares buildheap y extraer para los metodos minHeap y maxHeap
         //Este método organiza una lista de procesos para que cumpla con la estructura de un heap,
-       // ya sea un MinHeap (para Shortest Job First) o un MaxHeap (para PPCSA). Se aplica de manera recursiva desde un nodo hasta que todo 
+       // ya sea un MinHeap (para Shortest Job First) o un MaxHeap (para PPCSA). Se aplica de manera iterativa desde un nodo hasta que todo 
        //el heap esté en orden.
-           private void buildHeap(int i, List<Proceso> datos, bool isMax)
-             {
-              int main = i;  // Nodo principal (raíz de este subárbol)
-              int izquierdo = 2 * i + 1;  // Hijo izquierdo
-              int derecho = 2 * i + 2;    // Hijo derecho
-    
-             // Comparar con el hijo izquierdo
-              if ((isMax && izquierdo < datos.Count && datos[izquierdo].prioridad > datos[main].prioridad) ||
-                (!isMax && izquierdo < datos.Count && datos[izquierdo].tiempo < datos[main].tiempo))
-               {
-                 main = izquierdo;  // Si el hijo izquierdo es mayor (MaxHeap) o menor (MinHeap), hacer que sea la nueva raíz.
-               }
-    
-             // Comparar con el hijo derecho
-              if ((isMax && derecho < datos.Count && datos[derecho].prioridad > datos[main].prioridad) ||
-               (!isMax && derecho < datos.Count && datos[derecho].tiempo < datos[main].tiempo))
-               {
-                 main = derecho;  // Si el hijo derecho es mayor o menor, ajustamos la raíz.
-               }
-    
-             // Si se encontró un valor mayor o menor, intercambiar y seguir reorganizando el heap.
-             if (main != i)
-              {
-               swap(main, i, datos);
-               buildHeap(main, datos, isMax);
-              }
-            }
+           private void buildHeap(int i, List<Proceso> datos, bool isMax)//PARTE ITERATIVA
+        {
+            int main = i;  // Nodo principal (raíz de este subárbol)
 
+       while (i<datos.Count)
+       {
+        int izquierdo = 2 * main + 1;  // Hijo izquierdo
+        int derecho = 2 * main + 2;    // Hijo derecho
+        int nuevoMain = main;
+
+        // Comparar con el hijo izquierdo
+        if ((isMax && izquierdo < datos.Count && datos[izquierdo].prioridad > datos[nuevoMain].prioridad) ||
+            (!isMax && izquierdo < datos.Count && datos[izquierdo].tiempo < datos[nuevoMain].tiempo))
+        {
+            nuevoMain = izquierdo;  // Si el hijo izquierdo es mayor (MaxHeap) o menor (MinHeap), hacer que sea la nueva raíz.
+        }
+
+        // Comparar con el hijo derecho
+        if ((isMax && derecho < datos.Count && datos[derecho].prioridad > datos[nuevoMain].prioridad) ||
+            (!isMax && derecho < datos.Count && datos[derecho].tiempo < datos[nuevoMain].tiempo))
+        {
+            nuevoMain = derecho;  // Si el hijo derecho es mayor o menor, ajustamos la raíz.
+        }
+
+        // Si no hay cambios, terminar el bucle
+        if (nuevoMain == main)
+        {
+            break;
+        }
+
+        // Si hay cambios, intercambiar y continuar reorganizando
+        swap(main, nuevoMain, datos);
+
+        // Actualizar el índice principal para continuar el bucle
+        main = nuevoMain;
+    }
+}
             //Este método extrae la raíz del heap, ya sea el proceso con menor tiempo (en SJF) o el de mayor prioridad (en PPCSA), 
             //y reorganiza el heap para mantener su estructura.
             
