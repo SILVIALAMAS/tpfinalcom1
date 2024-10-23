@@ -8,7 +8,7 @@ using tp1;
 namespace tpfinal
 {
 
-    public class Estrategia
+   public class Estrategia
     {
        private string imprimir(Proceso p)
 		{
@@ -24,7 +24,7 @@ namespace tpfinal
     
             // Aplicar buildHeap a cada padre para conseguir una Heap
             for (int i = heap.Count / 2 - 1; i >= 0; i--)
-            buildHeap(i, heap, false);  // false para MinHeap (SJF)
+            buildHeap(/*i,*/ heap, false);  // false para MinHeap (SJF)
     
           // Las hojas son los nodos a partir de heap.Count / 2
            for (int i = heap.Count / 2; i < heap.Count; i++)
@@ -61,7 +61,7 @@ namespace tpfinal
     
           // Aplicar buildHeap a cada padre para conseguir una MinHeap
            for (int i = heap.Count / 2 - 1; i >= 0; i--)
-           buildHeap(i, heap, false);  // false para MinHeap
+           buildHeap(/*i,*/ heap, false);  // false para MinHeap
     
           // Imprimir los nodos nivel por nivel
            for (int i = 0; i < heap.Count; i++)
@@ -95,7 +95,7 @@ namespace tpfinal
     
             // Aplicar buildHeap a cada padre para conseguir una MinHeap
             for (int i = minHeap.Count / 2 - 1; i >= 0; i--)
-            buildHeap(i, minHeap, false);  // false indica que es MinHeap (SJF)
+            buildHeap(/*i,*/ minHeap, false);  // false indica que es MinHeap (SJF)
     
              // Extraer procesos en orden de menor tiempo
             for (int i = minHeap.Count; i > 0; i--)
@@ -116,56 +116,56 @@ namespace tpfinal
     
             // Aplicar buildHeap a cada padre para conseguir una MaxHeap
             for (int i = maxHeap.Count / 2 - 1; i >= 0; i--)
-            buildHeap(i, maxHeap, true);  // true indica que es MaxHeap (PPCSA)
+            buildHeap(/*i,*/ maxHeap, true);  // true indica que es MaxHeap (PPCSA)
     
             // Extraer procesos en orden de mayor prioridad
             for (int i = maxHeap.Count; i > 0; i--)
             collected.Add(extraer(maxHeap, true));  // true indica que es MaxHeap
         	
         }
+	 private void buildHeap(List<Proceso> datos, bool isMax) // PARTE ITERATIVA CON COLA
+             {
+               Queue<int> cola = new Queue<int>();
 
-        //debo implementar los metodos auxiliares buildheap y extraer para los metodos minHeap y maxHeap
-        //Este método organiza una lista de procesos para que cumpla con la estructura de un heap,
-       // ya sea un MinHeap (para Shortest Job First) o un MaxHeap (para PPCSA). Se aplica de manera iterativa desde un nodo hasta que todo 
-       //el heap esté en orden.
-           private void buildHeap(int i, List<Proceso> datos, bool isMax)//PARTE ITERATIVA
-        {
-            int main = i;  // Nodo principal (raíz de este subárbol)
+             // Agregar todos los nodos padre a la cola
+             for (int i = datos.Count / 2 - 1; i >= 0; i--)
+             {
+               cola.Enqueue(i);
+              }
 
-       while (i<datos.Count)
-       {
-        int izquierdo = 2 * main + 1;  // Hijo izquierdo
-        int derecho = 2 * main + 2;    // Hijo derecho
-        int nuevoMain = main;
+           // Procesar cada nodo en la cola
+              while (cola.Count > 0)
+              {
+                int main = cola.Dequeue();  // Nodo principal (raíz de este subárbol)
 
-        // Comparar con el hijo izquierdo
-        if ((isMax && izquierdo < datos.Count && datos[izquierdo].prioridad > datos[nuevoMain].prioridad) ||
-            (!isMax && izquierdo < datos.Count && datos[izquierdo].tiempo < datos[nuevoMain].tiempo))
-        {
-            nuevoMain = izquierdo;  // Si el hijo izquierdo es mayor (MaxHeap) o menor (MinHeap), hacer que sea la nueva raíz.
-        }
+               int izquierdo = 2 * main + 1;  // Hijo izquierdo
+               int derecho = 2 * main + 2;    // Hijo derecho
+               int nuevoMain = main;
 
-        // Comparar con el hijo derecho
-        if ((isMax && derecho < datos.Count && datos[derecho].prioridad > datos[nuevoMain].prioridad) ||
-            (!isMax && derecho < datos.Count && datos[derecho].tiempo < datos[nuevoMain].tiempo))
-        {
-            nuevoMain = derecho;  // Si el hijo derecho es mayor o menor, ajustamos la raíz.
-        }
+              // Comparar con el hijo izquierdo
+               if ((isMax && izquierdo < datos.Count && datos[izquierdo].prioridad > datos[nuevoMain].prioridad) ||
+                 (!isMax && izquierdo < datos.Count && datos[izquierdo].tiempo < datos[nuevoMain].tiempo))
+                {
+                 nuevoMain = izquierdo;  // Si el hijo izquierdo es mayor (MaxHeap) o menor (MinHeap), hacer que sea la nueva raíz.
+                }
 
-        // Si no hay cambios, terminar el bucle
-        if (nuevoMain == main)
-        {
-            break;
-        }
+                // Comparar con el hijo derecho
+                if ((isMax && derecho < datos.Count && datos[derecho].prioridad > datos[nuevoMain].prioridad) ||
+                    (!isMax && derecho < datos.Count && datos[derecho].tiempo < datos[nuevoMain].tiempo))
+                 {
+                    nuevoMain = derecho;  // Si el hijo derecho es mayor o menor, ajustamos la raíz.
+                 }
 
-        // Si hay cambios, intercambiar y continuar reorganizando
-        swap(main, nuevoMain, datos);
-
-        // Actualizar el índice principal para continuar el bucle
-        main = nuevoMain;
-    }
-}
-            //Este método extrae la raíz del heap, ya sea el proceso con menor tiempo (en SJF) o el de mayor prioridad (en PPCSA), 
+                // Si no hay cambios, continuar con el siguiente nodo
+                if (nuevoMain != main)
+                 {
+                   // Si hay cambios, intercambiar y agregar el nuevoMain a la cola
+                    swap(main, nuevoMain, datos);
+                    cola.Enqueue(nuevoMain); // Agregar el nodo que fue movido a la cola
+                 }
+               }
+              }
+ //Este método extrae la raíz del heap, ya sea el proceso con menor tiempo (en SJF) o el de mayor prioridad (en PPCSA), 
             //y reorganiza el heap para mantener su estructura.
             
             private Proceso extraer(List<Proceso> datos, bool isMax)
@@ -178,7 +178,7 @@ namespace tpfinal
                 datos.RemoveAt(datos.Count - 1);
     
               // Reorganizar el heap
-                buildHeap(0, datos, isMax);
+                buildHeap(/*0,*/ datos, isMax);
     
               // Retornar el proceso extraído
                return aRetornar;
